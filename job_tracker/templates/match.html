@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Skill-Based Job Match</h2>
+        <p class="text-muted mb-0">Compare your technical skills against each job's JSON requirements to calculate match percentages.</p>
+    </div>
+</div>
+
+<!-- User Skills Input Card -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('job_match') }}" class="row g-3 align-items-end">
+            <div class="col-md-9">
+                <label class="form-label fw-bold">Your Skills (comma-separated)</label>
+                <input type="text" name="user_skills" class="form-control" value="{{ raw_skills }}" placeholder="e.g., Python, SQL, Linux, SIEM, Networking, Flask" required>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Calculate Match %</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Match Results Table -->
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Role & Company</th>
+                    <th>Match Score</th>
+                    <th>Matched Skills</th>
+                    <th>Missing Skills</th>
+                    <th>Salary Range</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in results %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ item.job_title }}</div>
+                        <div class="small text-muted">{{ item.company_name }} • {{ item.job_type }}</div>
+                    </td>
+                    <td style="min-width: 170px;">
+                        {% if item.match_pct >= 75 %}
+                            {% set bar_color = 'bg-success' %}
+                        {% elif item.match_pct >= 40 %}
+                            {% set bar_color = 'bg-warning text-dark' %}
+                        {% else %}
+                            {% set bar_color = 'bg-danger' %}
+                        {% endif %}
+                        <div class="progress match-bar">
+                            <div class="progress-bar {{ bar_color }}" role="progressbar" style="width: {{ item.match_pct }}%">
+                                {{ item.match_pct }}%
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% for sk in item.matched_skills %}
+                            <span class="badge bg-success skill-badge">{{ sk }}</span>
+                        {% else %}
+                            <span class="text-muted small">None</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for sk in item.missing_skills %}
+                            <span class="badge bg-light text-danger border border-danger skill-badge">{{ sk }}</span>
+                        {% else %}
+                            <span class="badge bg-light text-success border skill-badge">All skills met!</span>
+                        {% endfor %}
+                    </td>
+                    <td class="small">
+                        {% if item.salary_min and item.salary_max %}
+                            ${{ "{:,}".format(item.salary_min) }} – ${{ "{:,}".format(item.salary_max) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">No jobs available to match against.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

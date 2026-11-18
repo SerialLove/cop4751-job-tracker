@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Application Overview</h2>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Total Applications</h5>
+                <p class="display-5 fw-bold mb-0">{{ total_apps }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Open Jobs Tracked</h5>
+                <p class="display-5 fw-bold mb-0">{{ total_jobs }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-secondary shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Target Companies</h5>
+                <p class="display-5 fw-bold mb-0">{{ total_companies }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header fw-bold">Applications by Status</div>
+            <ul class="list-group list-group-flush">
+                {% for row in status_counts %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ row.status }}
+                    <span class="badge bg-dark rounded-pill">{{ row.count }}</span>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No applications logged yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header fw-bold">Recent Applications</div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Company</th>
+                            <th>Role</th>
+                            <th>Date Applied</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in recent_apps %}
+                        <tr>
+                            <td class="fw-semibold">{{ app.company_name }}</td>
+                            <td>{{ app.job_title }}</td>
+                            <td>{{ app.application_date }}</td>
+                            <td><span class="badge bg-info text-dark">{{ app.status }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No recent applications found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
